@@ -1,41 +1,29 @@
 document.addEventListener('DOMContentLoaded', function () {
     const playButton = document.getElementById('playButton');
 
-    playButton.addEventListener('click', function () {
+    playButton.addEventListener('click', async function () {
         const textInput = document.getElementById('textInput').value.trim();
+        // console.log("textInput check", textInput);
+        // console.log("textInput type", typeof textInput);
 
-        const accessKeyId = process.env.accessKeyId;
-        const secretAccessKey = process.env.secretAccessKey;
-        AWS.config.update({
-            accessKeyId: accessKeyId,
-            secretAccessKey: secretAccessKey,
-            region: 'ap-southeast-1'
-        });
+        try {
+            // Query backend endpoint
+            const response = await axios.post('/generate-audio', {
+                textInput: textInput
+            }, {
+                responseType: 'arraybuffer'
+            });
 
-        const polly = new AWS.Polly();
+            const audioData = response.data;
+            const blob = new Blob([audioData], { type: 'audio/mpeg' });
 
-        const params = {
-            OutputFormat: "mp3",
-            SampleRate: "8000",
-            // Text: "All Gaul is divided into three parts",
-            Text: textInput,
-            TextType: "text",
-            VoiceId: "Joanna"
-        };
+            const audioElement = new Audio();
+            audioElement.src = URL.createObjectURL(blob);
 
-        polly.synthesizeSpeech(params, function (err, data) {
-            if (err) {
-                console.error(err, err.stack);
-            } else {
-                const audioData = data.AudioStream;
-                const blob = new Blob([audioData], { type: 'audio/mpeg' });
-
-                const audioElement = new Audio();
-                audioElement.src = URL.createObjectURL(blob);
-
-                // Play the audio
-                audioElement.play();
-            }
-        });
+            // Play the audio
+            audioElement.play();
+        } catch (error) {
+            console.error(error);
+        }
     });
 });
