@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', function () {
     playButton.addEventListener('click', function () {
         const textInput = document.getElementById('textInput').value.trim();
 
+        const accessKeyId = process.env.accessKeyId;
+        const secretAccessKey = process.env.secretAccessKey;
         AWS.config.update({
-            accessKeyId: 'AKIAZTS6EGSGHWRN53FP',
-            secretAccessKey: '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',
+            accessKeyId: accessKeyId,
+            secretAccessKey: secretAccessKey,
             region: 'ap-southeast-1'
         });
 
